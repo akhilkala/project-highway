@@ -2,7 +2,10 @@ import { useState } from "react";
 
 export interface InputState {
   value: string;
-  handleChange: (val: string) => void;
+  props: {
+    value: string;
+    onChangeText: (val: string) => void;
+  };
   handleReset: () => void;
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -14,7 +17,9 @@ const useInputState = (init?: string): InputState => {
   const handleChange = (val: string): void => setValue(val);
   const handleReset = (): void => setValue(initialState);
 
-  return { value, handleChange, handleReset, setValue };
+  const props = { value, onChangeText: handleChange };
+
+  return { value, props, handleReset, setValue };
 };
 
 export default useInputState;

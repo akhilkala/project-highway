@@ -1,22 +1,51 @@
 import React, { ReactElement } from "react";
 import styled from "styled-components/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import NewRide from "../components/NewRide";
+import * as Location from "expo-location";
+import MapView from "react-native-maps";
 
 export default function Home(): ReactElement {
+  const newRideRef = React.useRef();
+  const [location, setLocation] = React.useState<Location.LocationObject>();
+
+  React.useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      const locationSubcription = await Location.watchPositionAsync(
+        {
+          distanceInterval: 20,
+        },
+        setLocation
+      );
+    })();
+  }, []);
+
   return (
-    <Styled.container>
-      <Styled.top>
-        <Styled.heading>
-          Good Morning,
-          <Styled.headingName> Akhil</Styled.headingName>
-        </Styled.heading>
-        <Styled.subHeading>Where are you headed today?</Styled.subHeading>
-      </Styled.top>
-      <Styled.buttons>
-        <Styled.buttonHistory>History</Styled.buttonHistory>
-        <Styled.buttonNewRide>New Ride</Styled.buttonNewRide>
-      </Styled.buttons>
-    </Styled.container>
+    <>
+      <Styled.container>
+        <Styled.top>
+          <Styled.heading>
+            Good Morning,
+            <Styled.headingName> Akhil</Styled.headingName>
+          </Styled.heading>
+          <Styled.subHeading>Where are you headed today?</Styled.subHeading>
+          <Styled.map />
+        </Styled.top>
+        <Styled.buttons>
+          <Styled.buttonHistory>History</Styled.buttonHistory>
+          <Styled.buttonNewRide
+            onPress={() =>
+              // @ts-ignore
+              newRideRef?.current?.open()
+            }
+          >
+            New Ride
+          </Styled.buttonNewRide>
+        </Styled.buttons>
+      </Styled.container>
+      <NewRide ref={newRideRef} />
+    </>
   );
 }
 
@@ -66,5 +95,10 @@ const Styled = {
     font-size: 16px;
     margin-left: 10px;
     text-align: center;
+  `,
+  map: styled(MapView)`
+    width: 100%;
+    height: 200px;
+    margin-top: 15px;
   `,
 };
